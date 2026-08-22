@@ -12,29 +12,33 @@ export default function BuildItinerary() {
   const [sections, setSections] = useState([{ id: Date.now().toString(), location: trip?.destination || '', dateRange: '', budget: '' }]);
   const [isSaving, setIsSaving] = useState(false);
   
+  const destParam = searchParams.get('dest') || '';
   const handleSave = async () => {
     if (tripId) {
       setIsSaving(true);
-      // For each section, find a city ID (fallback to Tokyo if not found for hackathon)
       for (let i = 0; i < sections.length; i++) {
         const sec = sections[i];
-        let cityId = 'default';
-        const cities = await searchCities(sec.location || 'Tokyo');
-        if (cities.length > 0) {
+        const query = sec.location || destParam || 'Paris';
+        let cityId = null;
+        let cities = await searchCities(query);
+        if (!cities || cities.length === 0) {
+          cities = await searchCities(query.split(',')[0].trim());
+        }
+        if (!cities || cities.length === 0) {
+          cities = await searchCities('Paris');
+        }
+        if (cities && cities.length > 0) {
           cityId = cities[0].id;
         }
-        
-        // Parse dates roughly from dateRange (mocking dates since the UI uses a single string input for simplicity)
         const startDate = new Date().toISOString();
         const endDate = new Date(Date.now() + 86400000 * 3).toISOString();
-        
-        if (cityId !== 'default') {
+        if (cityId) {
           await addTripStop(tripId, cityId, startDate, endDate, i);
         }
       }
       setIsSaving(false);
     }
-    navigate(`/itinerary/${tripId || trip?.id || '1'}`);
+    navigate('/itinerary/' + (tripId || trip?.id || '1'));
   };
 
   return (

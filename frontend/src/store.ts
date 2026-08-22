@@ -117,29 +117,42 @@ export const useStore = create<AppState>()(
 
       addTrip: async (tripData) => {
         const token = get().user?.token;
-        if (!token) return;
-        
-        const res = await fetch('/api/trips', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}` 
-          },
-          body: JSON.stringify({
-            name: tripData.destination || tripData.name,
-            startDate: new Date(tripData.startDate).toISOString(),
-            endDate: new Date(tripData.endDate).toISOString(),
-            coverPhoto: tripData.image,
-            isPublic: tripData.isPublic
-          })
-        });
-        
-        if (res.ok) {
-          get().fetchTrips();
-        } else {
-           // Fallback for local UI only if API fails
-           set((state) => ({ trips: [...state.trips, tripData] }));
+        if (!token) return null;
+        try {
+          const res = await fetch('/api/trips', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + token 
+            },
+            body: JSON.stringify({
+              name: tripData.name || tripData.destination || 'New Trip',
+              description: tripData.destination || tripData.name || 'Custom Trip',
+              startDate: tripData.startDate ? new Date(tripData.startDate).toISOString() : new Date().toISOString(),
+              endDate: tripData.endDate ? new Date(tripData.endDate).toISOString() : new Date(Date.now() + 86400000 * 3).toISOString(),
+              coverPhoto: tripData.image || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=800&q=80',
+              isPublic: tripData.isPublic === true
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            await get().fetchTrips();
+            return data;
+          }
+        } catch (e) {
+          console.error(e);
         }
+        const fallback = {
+          id: tripData.id || Date.now().toString(),
+          ...tripData,
+          destination: tripData.destination || tripData.name,
+          budget: 0,
+          expenses: 0,
+          status: 'upcoming',
+          image: tripData.image || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=800&q=80'
+        };
+        set((state) => ({ trips: [...state.trips, fallback] }));
+        return fallback;
       },
 
       updateTrip: (id, updates) => set((state) => ({

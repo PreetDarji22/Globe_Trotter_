@@ -36,18 +36,19 @@ export default function CreateTrip() {
     setShowDropdown(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const tripId = Date.now().toString();
-    addTrip({
-      id: tripId,
-      ...formData,
-      budget: 0,
-      expenses: 0,
-      status: 'upcoming',
-      image: (formData as any).image || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&q=80&w=800'
+    const createdTrip = await addTrip({
+      name: formData.name || formData.destination || 'New Trip',
+      destination: formData.destination || formData.name || 'Custom Trip',
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      image: (formData).image || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=800&q=80',
+      isPublic: formData.isPublic
     });
-    navigate(`/build-itinerary?tripId=${tripId}`);
+    const targetId = createdTrip?.id || Date.now().toString();
+    const dest = encodeURIComponent(formData.destination || formData.name || '');
+    navigate('/build-itinerary?tripId=' + targetId + '&dest=' + dest);
   };
 
   // Keep static suggestions for the bottom grid
