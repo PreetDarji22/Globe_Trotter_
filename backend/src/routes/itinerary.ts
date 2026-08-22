@@ -48,7 +48,7 @@ router.delete('/stops/:stopId', async (req: AuthRequest, res) => {
 
 router.post('/stops/:stopId/activities', async (req: AuthRequest, res) => {
   try {
-    const { name, category, startTime, durationMinutes, estimatedCost, description } = req.body;
+    const { name, title, category, activityType, startTime, durationMinutes, estimatedCost, cost, description } = req.body;
     
     const stop = await prisma.tripStop.findUnique({ 
       where: { id: req.params.stopId },
@@ -56,20 +56,26 @@ router.post('/stops/:stopId/activities', async (req: AuthRequest, res) => {
     });
     if (!stop || stop.trip.userId !== req.user!.id) return res.status(403).json({ error: 'Forbidden' });
 
+    const actName = name || title || 'Activity';
+    const actCategory = category || activityType || 'Sightseeing';
+    const actCost = estimatedCost !== undefined ? Number(estimatedCost) : (cost !== undefined ? Number(cost) : 0);
+    const actDuration = durationMinutes ? Number(durationMinutes) : 60;
+    const actStart = startTime ? new Date(startTime) : new Date();
+
     const activity = await prisma.activity.create({
       data: {
         tripStopId: req.params.stopId,
-        name,
-        category,
-        startTime: new Date(startTime),
-        durationMinutes,
-        estimatedCost,
-        description
+        name: actName,
+        category: actCategory,
+        startTime: actStart,
+        durationMinutes: actDuration,
+        estimatedCost: actCost,
+        description: description || ''
       }
     });
     res.status(201).json(activity);
   } catch (error) {
-    console.error(error);
+    console.error('Add activity error:', error);
     res.status(500).json({ error: 'Failed to add activity' });
   }
 });

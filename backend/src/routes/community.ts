@@ -8,31 +8,20 @@ router.get('/', async (req, res) => {
   try {
     const publicTrips = await prisma.trip.findMany({
       where: { isPublic: true },
-      include: {
+     include: {
         user: {
           select: { firstName: true, lastName: true, profilePicture: true }
         },
-        stops: {
-          include: { city: true }
-        },
-        likes: {
-          select: { userId: true }
-        },
-        comments: {
-          include: {
-            user: {
-              select: { firstName: true, lastName: true, profilePicture: true }
-            }
-          },
-          orderBy: { createdAt: 'desc' }
-        }
+        stops: { include: { city: true, activities: true } },
+        likes: { select: { userId: true } },
+        comments: { include: { user: { select: { firstName: true, lastName: true, profilePicture: true } } }, orderBy: { createdAt: 'desc' } }
       },
       orderBy: { createdAt: 'desc' },
       take: 20
     });
     res.json(publicTrips);
   } catch (error) {
-    console.error(error);
+    console.error('COMMUNITY_GET_ERROR:', error);
     res.status(500).json({ error: 'Failed to fetch community trips' });
   }
 });
@@ -40,21 +29,13 @@ router.get('/', async (req, res) => {
 router.post('/:id/like', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const existingLike = await prisma.like.findUnique({
-      where: {
-        userId_tripId: {
-          userId: req.user!.id,
-          tripId: req.params.id
-        }
-      }
+      where: { userId_tripId: { userId: req.user!.id, tripId: req.params.id } }
     });
-
     if (existingLike) {
       await prisma.like.delete({ where: { id: existingLike.id } });
       return res.json({ liked: false });
     } else {
-      await prisma.like.create({
-        data: { userId: req.user!.id, tripId: req.params.id }
-      });
+      await prisma.like.create({ data: { userId: req.user!.id, tripId: req.params.id } });
       return res.json({ liked: true });
     }
   } catch (error) {
@@ -65,14 +46,8 @@ router.post('/:id/like', authenticateToken, async (req: AuthRequest, res) => {
 router.post('/:id/comment', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const comment = await prisma.comment.create({
-      data: {
-        text: req.body.text,
-        userId: req.user!.id,
-        tripId: req.params.id
-      },
-      include: {
-        user: { select: { firstName: true, lastName: true, profilePicture: true } }
-      }
+      data: { text: req.body.text, userId: req.user!.id, tripId: req.params.id },
+      include: { user: { select: { firstName: true, lastName: true, profilePicture: true } } }
     });
     res.status(201).json(comment);
   } catch (error) {
@@ -86,16 +61,13 @@ router.post('/:id/fork', authenticateToken, async (req: AuthRequest, res) => {
       where: { id: req.params.id },
       include: { stops: { include: { activities: true } } }
     });
-
-    if (!originalTrip || !originalTrip.isPublic) {
-      return res.status(404).json({ error: 'Public trip not found' });
+    if (!originalTrip) {
+      return res.status(404).json({ error: 'Trip not found' });
     }
-
-    // Clone the trip
     const newTrip = await prisma.trip.create({
       data: {
         userId: req.user!.id,
-        name: `${originalTrip.name} (Forked)`,
+        name: originalTrip.name + ' (Forked)',
         description: originalTrip.description,
         startDate: new Date(),
         endDate: new Date(Date.now() + (originalTrip.endDate.getTime() - originalTrip.startDate.getTime())),
@@ -109,23 +81,22 @@ router.post('/:id/fork', authenticateToken, async (req: AuthRequest, res) => {
             orderIndex: stop.orderIndex,
             activities: {
               create: stop.activities.map(act => ({
-                name: act.name,
+              name: act.name,
                 category: act.category,
                 startTime: new Date(),
-                durationMinutes: act.durationMinutes,
-                estimatedCost: act.estimatedCost,
-                description: act.description
+                durationMinutes: act.durationMinutes || 60,
+                estimatedCost: act.estimatedCost || 0,
+                description: act.description || ''
               }))
             }
           }))
         }
       }
     });
-    
     res.json(newTrip);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fork trip' });
+    console.error('COMMUNITY_FORK_ERROR:', error);
+    res.status(500).json({ error: 'Failed to fork trip', details: String(error) });
   }
 });
 
