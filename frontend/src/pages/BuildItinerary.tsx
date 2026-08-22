@@ -5,15 +5,34 @@ import { useStore } from '../store';
 export default function BuildItinerary() {
   const [searchParams] = useSearchParams();
   const tripId = searchParams.get('tripId');
-  const { trips, updateTrip } = useStore();
+  const { trips, addTripStop, searchCities } = useStore() as any;
   const navigate = useNavigate();
   
-  const trip = trips.find(t => t.id === tripId) || trips[0];
-  const [sections, setSections] = useState([{ id: Date.now().toString(), dateRange: '', budget: '' }]);
+  const trip = trips.find((t: any) => t.id === tripId) || trips[0];
+  const [sections, setSections] = useState([{ id: Date.now().toString(), location: trip?.destination || '', dateRange: '', budget: '' }]);
+  const [isSaving, setIsSaving] = useState(false);
   
-  const handleSave = () => {
+  const handleSave = async () => {
     if (tripId) {
-      updateTrip(tripId, { sections });
+      setIsSaving(true);
+      // For each section, find a city ID (fallback to Tokyo if not found for hackathon)
+      for (let i = 0; i < sections.length; i++) {
+        const sec = sections[i];
+        let cityId = 'default';
+        const cities = await searchCities(sec.location || 'Tokyo');
+        if (cities.length > 0) {
+          cityId = cities[0].id;
+        }
+        
+        // Parse dates roughly from dateRange (mocking dates since the UI uses a single string input for simplicity)
+        const startDate = new Date().toISOString();
+        const endDate = new Date(Date.now() + 86400000 * 3).toISOString();
+        
+        if (cityId !== 'default') {
+          await addTripStop(tripId, cityId, startDate, endDate, i);
+        }
+      }
+      setIsSaving(false);
     }
     navigate(`/itinerary/${tripId || trip?.id || '1'}`);
   };
@@ -35,25 +54,33 @@ export default function BuildItinerary() {
               )}
             </div>
             <p className="text-slate/60 font-medium mb-8 text-sm max-w-2xl leading-relaxed">
-              Define the timeline and budget for this specific part of your trip. This helps in organizing separate cities, weeks, or themes (e.g., "Relaxation phase", "Adventure phase").
+              Define the timeline and budget for this specific part of your trip. This helps in organizing separate cities, weeks, or themes.
             </p>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <input 
-                  placeholder="Date Range (e.g. Oct 1 - Oct 5)" 
-                  value={sec.dateRange}
-                  onChange={(e) => setSections(sections.map(s => s.id === sec.id ? {...s, dateRange: e.target.value} : s))}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-5 py-4 outline-none focus:border-terracotta focus:bg-white focus:shadow-sm transition-all font-medium text-slate" 
-                />
-              </div>
-              <div className="flex-1">
-                <input 
-                  type="number"
-                  placeholder="Budget of this section ($)" 
-                  value={sec.budget}
-                  onChange={(e) => setSections(sections.map(s => s.id === sec.id ? {...s, budget: e.target.value} : s))}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-5 py-4 outline-none focus:border-terracotta focus:bg-white focus:shadow-sm transition-all font-medium text-slate" 
-                />
+            <div className="flex flex-col gap-4">
+              <input 
+                placeholder="Location / City (e.g. Paris)" 
+                value={sec.location}
+                onChange={(e) => setSections(sections.map(s => s.id === sec.id ? {...s, location: e.target.value} : s))}
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-5 py-4 outline-none focus:border-terracotta focus:bg-white transition-all font-medium text-slate" 
+              />
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <input 
+                    placeholder="Date Range (e.g. Oct 1 - Oct 5)" 
+                    value={sec.dateRange}
+                    onChange={(e) => setSections(sections.map(s => s.id === sec.id ? {...s, dateRange: e.target.value} : s))}
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-5 py-4 outline-none focus:border-terracotta focus:bg-white transition-all font-medium text-slate" 
+                  />
+                </div>
+                <div className="flex-1">
+                  <input 
+                    type="number"
+                    placeholder="Budget of this section ($)" 
+                    value={sec.budget}
+                    onChange={(e) => setSections(sections.map(s => s.id === sec.id ? {...s, budget: e.target.value} : s))}
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-5 py-4 outline-none focus:border-terracotta focus:bg-white transition-all font-medium text-slate" 
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -69,9 +96,10 @@ export default function BuildItinerary() {
         </button>
         <button 
           onClick={handleSave}
-          className="w-full md:w-auto bg-slate text-white px-12 py-4 rounded-full font-bold shadow-lg hover:-translate-y-1 hover:shadow-xl hover:bg-slate/90 transition-all text-lg"
+          disabled={isSaving}
+          className="w-full md:w-auto bg-slate text-white px-12 py-4 rounded-full font-bold shadow-lg hover:-translate-y-1 hover:shadow-xl hover:bg-slate/90 transition-all text-lg disabled:opacity-50"
         >
-          Save & View Itinerary
+          {isSaving ? 'Saving...' : 'Save & View Itinerary'}
         </button>
       </div>
     </div>

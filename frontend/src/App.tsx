@@ -13,6 +13,17 @@ import Search from './pages/Search';
 import CalendarView from './pages/CalendarView';
 import Admin from './pages/Admin';
 
+import { Navigate } from 'react-router-dom';
+import { useStore } from './store';
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useStore();
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+};
+
 function AppContent() {
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
@@ -24,16 +35,17 @@ function AppContent() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Login isRegister />} />
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/trips" element={<TripListing />} />
-          <Route path="/create-trip" element={<CreateTrip />} />
-          <Route path="/build-itinerary" element={<BuildItinerary />} />
-          <Route path="/itinerary/:id" element={<ItineraryView />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/calendar" element={<CalendarView />} />
-          <Route path="/admin" element={<Admin />} />
+          
+          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/trips" element={<ProtectedRoute><TripListing /></ProtectedRoute>} />
+          <Route path="/create-trip" element={<ProtectedRoute><CreateTrip /></ProtectedRoute>} />
+          <Route path="/build-itinerary" element={<ProtectedRoute><BuildItinerary /></ProtectedRoute>} />
+          <Route path="/itinerary/:id" element={<ProtectedRoute><ItineraryView /></ProtectedRoute>} />
+          <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+          <Route path="/calendar" element={<ProtectedRoute><CalendarView /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         </Routes>
       </main>
     </div>
