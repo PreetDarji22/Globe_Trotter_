@@ -6,6 +6,7 @@ import tripRoutes from './routes/trips';
 import communityRoutes from './routes/community';
 import itineraryRoutes from './routes/itinerary';
 import searchRoutes from './routes/search';
+import adminRoutes from './routes/admin';
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use('/api/trips', tripRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api', itineraryRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'GlobeTrotter API is running!' });

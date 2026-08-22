@@ -37,6 +37,7 @@ interface AppState {
   fetchTripDetails: (tripId: string) => Promise<void>;
   addActivity: (stopId: string, activityData: any) => Promise<void>;
   forkTrip: (tripId: string) => Promise<string | null>;
+  fetchAdminStats: () => Promise<any>;
 }
 
 export const useStore = create<AppState>()(
@@ -216,6 +217,18 @@ export const useStore = create<AppState>()(
         }
         return null;
       },
+
+      fetchAdminStats: async () => {
+        const token = get().user?.token;
+        if (!token) return null;
+        const res = await fetch('/api/admin/stats', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          return await res.json();
+        }
+        return null;
+      }
     }),
     { name: 'global-trotter-storage-v2' }
   )

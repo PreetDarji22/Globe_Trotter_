@@ -134,33 +134,75 @@ export default function ItineraryView() {
               );
             })}
 
-            {/* Inline Add Activity Form */}
+            {/* Activity Search Modal Trigger */}
             <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center relative w-full pr-4 md:pr-12 group mt-4">
-              {showActivityForm === stop.id ? (
-                <div className="w-full bg-stone-50 border border-stone-200 rounded-3xl p-6 shadow-sm z-10">
-                   <h4 className="font-bold text-slate mb-4">Add New Activity</h4>
-                   <div className="grid grid-cols-2 gap-4 mb-4">
-                     <input placeholder="Activity Title" value={activityForm.title} onChange={e => setActivityForm({...activityForm, title: e.target.value})} className="col-span-2 border border-stone-200 rounded-xl px-4 py-2" />
-                     <select value={activityForm.type} onChange={e => setActivityForm({...activityForm, type: e.target.value})} className="border border-stone-200 rounded-xl px-4 py-2">
-                        <option>Sightseeing</option><option>Food</option><option>Transit</option><option>Stay</option>
-                     </select>
-                     <input type="number" placeholder="Cost ($)" value={activityForm.cost} onChange={e => setActivityForm({...activityForm, cost: e.target.value})} className="border border-stone-200 rounded-xl px-4 py-2" />
-                   </div>
-                   <div className="flex gap-4">
-                     <button onClick={() => handleAddActivity(stop.id)} className="bg-slate text-white px-6 py-2 rounded-xl font-bold">Save</button>
-                     <button onClick={() => setShowActivityForm(null)} className="text-stone-500 font-bold px-4 py-2">Cancel</button>
-                   </div>
-                </div>
-              ) : (
-                <button onClick={() => setShowActivityForm(stop.id)} className="w-full md:flex-1 border-2 border-dashed border-stone-300 rounded-3xl p-5 bg-transparent hover:bg-stone-50 hover:border-stone-400 transition-all flex items-center justify-center gap-3 z-10 text-stone-500 font-bold">
-                  <Plus size={20} /> Add Activity
-                </button>
-              )}
+              <button onClick={() => setShowActivityForm(stop.id)} className="w-full md:flex-1 border-2 border-dashed border-stone-300 rounded-3xl p-5 bg-transparent hover:bg-stone-50 hover:border-stone-400 transition-all flex items-center justify-center gap-3 z-10 text-stone-500 font-bold">
+                <Plus size={20} /> Add Activity
+              </button>
             </div>
             
           </div>
         ))}
       </div>
+
+      {/* Activity Search Modal (Feature #8) */}
+      {showActivityForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in">
+          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+            <div className="p-6 md:p-8 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
+              <div>
+                <h3 className="font-display font-black text-2xl text-slate">Activity Search</h3>
+                <p className="text-stone-500 font-medium">Browse and select things to do</p>
+              </div>
+              <button onClick={() => setShowActivityForm(null)} className="w-10 h-10 rounded-full bg-stone-200 text-stone-500 flex items-center justify-center hover:bg-stone-300 font-bold">X</button>
+            </div>
+            
+            <div className="p-6 md:p-8 overflow-y-auto bg-stone-50 flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  { title: 'Eiffel Tower Tour', type: 'Sightseeing', cost: 35, img: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=600' },
+                  { title: 'Sushi Tasting', type: 'Food', cost: 120, img: 'https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=600' },
+                  { title: 'Subway Pass (3 Days)', type: 'Transit', cost: 25, img: 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=600' },
+                  { title: 'Luxury Spa', type: 'Stay', cost: 200, img: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600' },
+                  { title: 'Colosseum Entry', type: 'Sightseeing', cost: 20, img: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600' },
+                  { title: 'Local Street Food', type: 'Food', cost: 15, img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600' },
+                ].map((act, i) => (
+                  <div key={i} className="bg-white border border-stone-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all group cursor-pointer">
+                    <div className="h-40 overflow-hidden relative">
+                      <SafeImage src={act.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={act.title} />
+                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur text-slate px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider">{act.type}</div>
+                    </div>
+                    <div className="p-5">
+                      <h4 className="font-bold text-lg text-slate mb-1">{act.title}</h4>
+                      <p className="text-terracotta font-black text-xl mb-4">${act.cost}</p>
+                      <button onClick={() => {
+                        setActivityForm({ title: act.title, type: act.type, cost: act.cost.toString(), startTime: '10:00 AM' });
+                        handleAddActivity(showActivityForm);
+                      }} className="w-full bg-slate text-white py-2.5 rounded-xl font-bold hover:bg-slate/90 transition-colors">
+                        Add to Trip
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-8 border-t border-stone-200 pt-8">
+                <h4 className="font-bold text-slate mb-4">Or add custom activity:</h4>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <input placeholder="Title" value={activityForm.title} onChange={e => setActivityForm({...activityForm, title: e.target.value})} className="col-span-1 md:col-span-2 border border-stone-200 rounded-xl px-4 py-3" />
+                  <select value={activityForm.type} onChange={e => setActivityForm({...activityForm, type: e.target.value})} className="border border-stone-200 rounded-xl px-4 py-3">
+                    <option>Sightseeing</option><option>Food</option><option>Transit</option><option>Stay</option>
+                  </select>
+                  <input type="number" placeholder="Cost ($)" value={activityForm.cost} onChange={e => setActivityForm({...activityForm, cost: e.target.value})} className="border border-stone-200 rounded-xl px-4 py-3" />
+                </div>
+                <button onClick={() => handleAddActivity(showActivityForm)} className="mt-4 bg-terracotta text-white px-8 py-3 rounded-xl font-bold hover:bg-terracotta/90 transition-colors">
+                  Save Custom Activity
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
