@@ -54,35 +54,6 @@ export default function Profile() {
   return (
     <div className="max-w-6xl mx-auto p-4 animate-in fade-in duration-500 pb-24">
       
-<<<<<<< HEAD
-      {/* Profile Header */}
-      <div className="flex flex-col md:flex-row items-center gap-10 mb-16 border-b border-stone-200 pb-12 mt-8">
-        <div className="relative">
-          <SafeImage src={user?.avatar || ''} alt="Profile" className="w-48 h-48 rounded-full border-4 border-white shadow-xl object-cover" />
-          <button onClick={() => setEditingPhoto(true)} className="absolute bottom-2 right-2 bg-white p-3 rounded-full shadow-md text-slate hover:text-terracotta transition-colors border border-stone-100">
-            <Edit3 size={20} />
-          </button>
-        </div>
-
-        {editingPhoto && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
-              <h3 className="font-bold text-xl text-slate mb-4">Update Profile Photo</h3>
-              <input 
-                placeholder="Paste Image URL" 
-                value={photoUrl} 
-                onChange={e => setPhotoUrl(e.target.value)} 
-                className="w-full border-2 border-stone-200 rounded-xl px-4 py-3 mb-6" 
-              />
-              <div className="flex gap-4">
-                <button onClick={handleUpdatePhoto} className="flex-1 bg-slate text-white py-3 rounded-full font-bold">Save</button>
-                <button onClick={() => setEditingPhoto(false)} className="flex-1 bg-stone-100 text-stone-600 py-3 rounded-full font-bold">Cancel</button>
-              </div>
-            </div>
-          </div>
-        )}
-        <div className="flex-1 bg-white border border-stone-200 rounded-[2rem] p-8 md:p-10 shadow-sm flex flex-col md:flex-row items-center justify-between text-center md:text-left">
-=======
       {/* Save Toast */}
       {savedSuccess && (
         <div className="mb-6 bg-emerald-50 border-2 border-emerald-300 text-emerald-800 rounded-2xl p-4 flex items-center gap-3 font-bold shadow-sm">
@@ -103,7 +74,6 @@ export default function Profile() {
         </div>
 
         <div className="flex-1 bg-white border border-stone-200 rounded-[2.5rem] p-8 md:p-10 shadow-sm flex flex-col md:flex-row items-center justify-between text-center md:text-left gap-6 w-full">
->>>>>>> 161ec59 (feat: Add Budget, Calendar Timeline, Public Share, User Settings, and Admin Analytics screens)
           <div>
             <span className="bg-terracotta/10 text-terracotta px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider inline-block mb-2">
               User Settings & Preferences
