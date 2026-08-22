@@ -43,9 +43,24 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName } });
+    res.json({ token, user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, profilePicture: user.profilePicture } });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+import { authenticateToken, AuthRequest } from '../middleware/auth';
+
+router.put('/profile', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const { profilePicture } = req.body;
+    await prisma.user.update({
+      where: { id: req.user!.id },
+      data: { profilePicture }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update profile' });
   }
 });
 

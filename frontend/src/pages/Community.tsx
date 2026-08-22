@@ -6,7 +6,7 @@ import { useStore } from '../store';
 import { useNavigate } from 'react-router-dom';
 
 export default function Community() {
-  const { communityTrips, fetchCommunityTrips, forkTrip } = useStore() as any;
+  const { communityTrips, fetchCommunityTrips, forkTrip, user, likeTrip, commentTrip } = useStore() as any;
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -49,17 +49,33 @@ export default function Community() {
                 <p className="text-slate/80 font-medium leading-relaxed mb-6">{post.description || 'No description provided.'}</p>
                 <div className="flex justify-between items-center border-t border-stone-100 pt-4">
                   <div className="flex gap-6">
-                    <button className="flex items-center gap-2 text-stone-500 font-bold hover:text-terracotta transition-colors">
-                      <Heart size={20} /> 0
+                    <button onClick={() => likeTrip(post.id)} className={`flex items-center gap-2 font-bold transition-colors ${post.likes?.some((l: any) => l.userId === user?.id) ? 'text-red-500' : 'text-stone-500 hover:text-red-500'}`}>
+                      <Heart size={20} className={post.likes?.some((l: any) => l.userId === user?.id) ? 'fill-red-500' : ''} /> {post.likes?.length || 0}
                     </button>
-                    <button className="flex items-center gap-2 text-stone-500 font-bold hover:text-blue-500 transition-colors">
-                      <MessageCircle size={20} /> Reply
+                    <button onClick={() => {
+                      const text = prompt('Enter your comment:');
+                      if (text) commentTrip(post.id, text);
+                    }} className="flex items-center gap-2 text-stone-500 font-bold hover:text-blue-500 transition-colors">
+                      <MessageCircle size={20} /> {post.comments?.length || 0} Comments
                     </button>
                   </div>
                   <button onClick={() => handleFork(post.id)} className="bg-slate text-white px-5 py-2 rounded-full font-bold shadow-sm hover:bg-slate/90 transition-colors hover:scale-105">
                     Fork Itinerary
                   </button>
                 </div>
+                {post.comments && post.comments.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-stone-100 space-y-3">
+                    {post.comments.slice(0, 3).map((comment: any) => (
+                      <div key={comment.id} className="flex gap-3 text-sm">
+                        <SafeImage src={comment.user.profilePicture || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150'} className="w-6 h-6 rounded-full object-cover" />
+                        <div>
+                          <span className="font-bold text-slate mr-2">{comment.user.firstName}</span>
+                          <span className="text-stone-600">{comment.text}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

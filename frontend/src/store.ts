@@ -38,6 +38,9 @@ interface AppState {
   addActivity: (stopId: string, activityData: any) => Promise<void>;
   forkTrip: (tripId: string) => Promise<string | null>;
   fetchAdminStats: () => Promise<any>;
+  likeTrip: (tripId: string) => Promise<boolean>;
+  commentTrip: (tripId: string, text: string) => Promise<void>;
+  updateProfilePicture: (url: string) => Promise<void>;
 }
 
 export const useStore = create<AppState>()(
@@ -231,6 +234,55 @@ export const useStore = create<AppState>()(
           return await res.json();
         }
         return null;
+      },
+
+      likeTrip: async (tripId: string) => {
+        const token = get().user?.token;
+        if (!token) return false;
+        const res = await fetch(`/api/community/${tripId}/like`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          get().fetchCommunityTrips();
+          const data = await res.json();
+          return data.liked;
+        }
+        return false;
+      },
+
+      commentTrip: async (tripId: string, text: string) => {
+        const token = get().user?.token;
+        if (!token) return;
+        const res = await fetch(`/api/community/${tripId}/comment`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}` 
+          },
+          body: JSON.stringify({ text })
+        });
+        if (res.ok) {
+          get().fetchCommunityTrips();
+        }
+      },
+
+      updateProfilePicture: async (url: string) => {
+        const token = get().user?.token;
+        if (!token) return;
+        const res = await fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}` 
+          },
+          body: JSON.stringify({ profilePicture: url })
+        });
+        if (res.ok) {
+          set(state => ({
+            user: state.user ? { ...state.user, avatar: url } : null
+          }));
+        }
       }
     }),
     { name: 'global-trotter-storage-v2' }

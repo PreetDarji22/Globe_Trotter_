@@ -14,6 +14,17 @@ router.get('/', async (req, res) => {
         },
         stops: {
           include: { city: true }
+        },
+        likes: {
+          select: { userId: true }
+        },
+        comments: {
+          include: {
+            user: {
+              select: { firstName: true, lastName: true, profilePicture: true }
+            }
+          },
+          orderBy: { createdAt: 'desc' }
         }
       },
       orderBy: { createdAt: 'desc' },
@@ -23,6 +34,49 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch community trips' });
+  }
+});
+
+router.post('/:id/like', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const existingLike = await prisma.like.findUnique({
+      where: {
+        userId_tripId: {
+          userId: req.user!.id,
+          tripId: req.params.id
+        }
+      }
+    });
+
+    if (existingLike) {
+      await prisma.like.delete({ where: { id: existingLike.id } });
+      return res.json({ liked: false });
+    } else {
+      await prisma.like.create({
+        data: { userId: req.user!.id, tripId: req.params.id }
+      });
+      return res.json({ liked: true });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to toggle like' });
+  }
+});
+
+router.post('/:id/comment', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const comment = await prisma.comment.create({
+      data: {
+        text: req.body.text,
+        userId: req.user!.id,
+        tripId: req.params.id
+      },
+      include: {
+        user: { select: { firstName: true, lastName: true, profilePicture: true } }
+      }
+    });
+    res.status(201).json(comment);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to post comment' });
   }
 });
 
