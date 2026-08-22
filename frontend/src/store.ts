@@ -21,7 +21,7 @@ interface AppState {
   sortBy: string;
   filterBy: string;
   groupBy: string;
-  login: (email: string, password?: string) => Promise<void>;
+  login: (email: string, password?: string) => Promise<boolean>;
   logout: () => void;
   fetchTrips: () => Promise<void>;
   addTrip: (trip: any) => Promise<void>;
@@ -81,9 +81,12 @@ export const useStore = create<AppState>()(
               } 
             });
             get().fetchTrips();
+            return true;
           }
+          return false;
         } catch (e) {
           console.error("Auth error", e);
+          return false;
         }
       },
       
