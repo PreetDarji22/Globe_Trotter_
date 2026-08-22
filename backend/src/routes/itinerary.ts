@@ -79,3 +79,5 @@ router.post('/stops/:stopId/activities', async (req: AuthRequest, res) => {
     res.status(500).json({ error: 'Failed to add activity' });
   }
 });
+
+export default router;

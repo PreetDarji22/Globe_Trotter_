@@ -38,13 +38,18 @@ export default function ItineraryView() {
     }
   }, [id]);
 
-  const handleAddActivity = async (stopId: string) => {
-    const costVal = parseFloat(activityForm.cost) || 0;
+  const handleAddActivity = async (stopId: string, customData?: any) => {
+    const dataToUse = customData || activityForm;
+    const rawCost = dataToUse.cost !== undefined && dataToUse.cost !== '' ? dataToUse.cost : (dataToUse.estimatedCost !== undefined && dataToUse.estimatedCost !== '' ? dataToUse.estimatedCost : 0);
+    const costVal = typeof rawCost === 'number' ? rawCost : (parseFloat(String(rawCost)) || 0);
+    const titleVal = dataToUse.title || dataToUse.name || 'New Activity';
+    const typeVal = dataToUse.type || dataToUse.category || 'Sightseeing';
+
     await addActivity(stopId, {
-      name: activityForm.title || 'New Activity',
-      title: activityForm.title || 'New Activity',
-      category: activityForm.type,
-      activityType: activityForm.type,
+      name: titleVal,
+      title: titleVal,
+      category: typeVal,
+      activityType: typeVal,
       estimatedCost: costVal,
       cost: costVal,
       durationMinutes: 60,
@@ -100,6 +105,11 @@ export default function ItineraryView() {
     { title: 'Luxury Spa', type: 'Stay', cost: 200, img: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600', desc: '2 hour relaxing massage and sauna' },
     { title: 'Colosseum Entry', type: 'Sightseeing', cost: 20, img: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600', desc: 'Standard entry ticket' },
     { title: 'Local Street Food', type: 'Food', cost: 15, img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600', desc: 'Explore the night market' },
+    { title: 'Bernina Alpine Train Ride', type: 'Transit', cost: 85, img: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=600', desc: 'Panoramic mountain rail journey' },
+    { title: 'Vatican & Sistine Chapel Tour', type: 'Sightseeing', cost: 55, img: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600', desc: 'Michelangelo masterwork guided tour' },
+    { title: 'Handmade Pasta & Gelato Class', type: 'Food', cost: 50, img: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=600', desc: 'Cook authentic pasta with Italian chef' },
+    { title: 'Northern Lights Superjeep Safari', type: 'Sightseeing', cost: 80, img: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?auto=format&fit=crop&w=600', desc: 'Night hunt away from light pollution' },
+    { title: 'SUMMIT One Vanderbilt Skyline Deck', type: 'Sightseeing', cost: 48, img: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=600', desc: '360 degree glass observation deck over NYC' },
   ];
 
   const filteredActivities = MOCK_ACTIVITIES.filter(act => {
@@ -193,7 +203,7 @@ export default function ItineraryView() {
               <div className="mb-8 pt-2 text-stone-500 font-bold">{stop.city?.name} ({new Date(stop.startDate).toLocaleDateString()} - {new Date(stop.endDate).toLocaleDateString()})</div>
               
               {stop.activities?.map((item: any, idx: number) => {
-                const Icon = getIcon(item.activityType);
+                const Icon = getIcon((item.category || item.activityType || "Sightseeing"));
                 return (
                   <div key={item.id} className="flex flex-col md:flex-row gap-6 md:gap-8 items-center relative w-full pr-4 md:pr-12 group">
                     {(idx !== stop.activities.length - 1 || showActivityForm === stop.id) && (
@@ -208,9 +218,9 @@ export default function ItineraryView() {
                         <Icon size={24} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-lg text-slate leading-tight">{item.title}</h4>
+                        <h4 className="font-bold text-lg text-slate leading-tight">{(item.name || item.title || "Activity")}</h4>
                         <div className="flex items-center gap-4 mt-2">
-                          <span className="bg-sand text-slate px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider">{item.activityType}</span>
+                          <span className="bg-sand text-slate px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider">{(item.category || item.activityType || "Sightseeing")}</span>
                           <p className="text-stone-500 text-sm font-medium flex items-center gap-1.5">
                             <Clock size={14}/> {new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </p>
@@ -221,7 +231,7 @@ export default function ItineraryView() {
                     {/* Expense Box */}
                     <div className="w-full md:w-48 border border-stone-200 rounded-3xl p-5 bg-white shadow-sm flex flex-col items-center justify-center group-hover:border-terracotta/50 transition-colors z-10 shrink-0">
                       <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Cost</span>
-                      <span className="font-black text-2xl text-slate">${item.cost}</span>
+                      <span className="font-black text-2xl text-slate">${(item.estimatedCost !== undefined ? Number(item.estimatedCost) : Number(item.cost || 0))}</span>
                     </div>
                   </div>
                 );
@@ -252,16 +262,16 @@ export default function ItineraryView() {
               </div>
               <div className="space-y-4">
                 {stop.activities?.map((item: any) => {
-                  const Icon = getIcon(item.activityType);
+                  const Icon = getIcon((item.category || item.activityType || "Sightseeing"));
                   return (
                     <div key={item.id} className="bg-white border border-stone-100 rounded-2xl p-4 shadow-sm flex gap-4">
                       <div className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center text-slate shrink-0">
                          <Icon size={18} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-sm text-slate">{item.title}</h4>
+                        <h4 className="font-bold text-sm text-slate">{(item.name || item.title || "Activity")}</h4>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs font-bold text-terracotta">${item.cost}</span>
+                          <span className="text-xs font-bold text-terracotta">${(item.estimatedCost !== undefined ? Number(item.estimatedCost) : Number(item.cost || 0))}</span>
                           <span className="text-stone-300">•</span>
                           <span className="text-xs font-medium text-stone-500">{new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
@@ -329,8 +339,7 @@ export default function ItineraryView() {
                         <p className="text-terracotta font-black text-xl mb-4">${act.cost}</p>
                       </div>
                       <button onClick={() => {
-                        setActivityForm({ title: act.title, type: act.type, cost: act.cost.toString(), startTime: '10:00 AM' });
-                        handleAddActivity(showActivityForm);
+                        handleAddActivity(showActivityForm, { title: act.title, type: act.type, cost: act.cost });
                       }} className="w-full bg-slate text-white py-2.5 rounded-xl font-bold hover:bg-slate/90 transition-colors">
                         Add to Trip
                       </button>
@@ -348,7 +357,7 @@ export default function ItineraryView() {
                   </select>
                   <input type="number" placeholder="Cost ($)" value={activityForm.cost} onChange={e => setActivityForm({...activityForm, cost: e.target.value})} className="border border-stone-200 rounded-xl px-4 py-3" />
                 </div>
-                <button onClick={() => handleAddActivity(showActivityForm)} className="mt-4 bg-terracotta text-white px-8 py-3 rounded-xl font-bold hover:bg-terracotta/90 transition-colors">
+                <button onClick={() => handleAddActivity(showActivityForm, activityForm)} className="mt-4 bg-terracotta text-white px-8 py-3 rounded-xl font-bold hover:bg-terracotta/90 transition-colors">
                   Save Custom Activity
                 </button>
               </div>

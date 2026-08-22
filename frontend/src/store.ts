@@ -16,6 +16,8 @@ export type Trip = {
 
 interface AppState {
   user: { name: string; email: string; avatar: string; token: string } | null;
+  welcomeMessage: string | null;
+  setWelcomeMessage: (msg: string | null) => void;
   trips: Trip[];
   searchQuery: string;
   sortBy: string;
@@ -47,6 +49,8 @@ export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
       user: null,
+      welcomeMessage: null,
+      setWelcomeMessage: (msg) => set({ welcomeMessage: msg }),
       trips: [],
       communityTrips: [],
       currentTrip: null,
@@ -83,6 +87,7 @@ export const useStore = create<AppState>()(
                 token: data.token 
               } 
             });
+            set({ welcomeMessage: `Welcome back, ${data.user.firstName || "Explorer"}! 🌍 Ready for your next journey?` });
             get().fetchTrips();
             return true;
           }
