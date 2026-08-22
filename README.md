@@ -6,7 +6,7 @@ GlobeTrotter is a modern, beautifully designed travel itinerary planning platfor
 
 ---
 
-## 🎯 Problem Statement (PS)
+## 🎯 Problem Statement  (PS)
 
 **The Problem:** Planning a multi-city trip is chaotic. Travelers often juggle between messy spreadsheets, unorganized notes, and dozens of browser tabs just to figure out what to do and how much it will cost. Furthermore, when friends ask for travel recommendations, there is no easy way to share a complete, copyable itinerary.
 
