@@ -24,6 +24,7 @@ interface AppState {
   filterBy: string;
   groupBy: string;
   login: (email: string, password?: string) => Promise<boolean>;
+  register: (userData: { firstName: string; lastName: string; email: string; password: string }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   fetchTrips: () => Promise<void>;
   addTrip: (trip: any) => Promise<void>;
@@ -59,6 +60,36 @@ export const useStore = create<AppState>()(
       filterBy: 'All',
       groupBy: 'None',
       
+      register: async (userData: { firstName: string; lastName: string; email: string; password: string }) => {
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+          });
+          
+          if (res.ok) {
+            const data = await res.json();
+            set({ 
+              user: { 
+                name: `${data.user.firstName} ${data.user.lastName}`, 
+                email: data.user.email, 
+                avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+                token: data.token 
+              } 
+            });
+            get().fetchTrips();
+            return { success: true };
+          } else {
+            const data = await res.json().catch(() => ({}));
+            return { success: false, error: data.error || 'Registration failed' };
+          }
+        } catch (e: any) {
+          console.error("Register error", e);
+          return { success: false, error: 'Network error during registration' };
+        }
+      },
+
       login: async (email, password = 'securepassword123') => {
         // For the hackathon, we auto-register if the user doesn't exist, or login if they do
         try {

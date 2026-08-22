@@ -12,6 +12,8 @@ import Profile from './pages/Profile';
 import Search from './pages/Search';
 import CalendarView from './pages/CalendarView';
 import Admin from './pages/Admin';
+import BudgetView from './pages/BudgetView';
+import SharedItinerary from './pages/SharedItinerary';
 
 import { Navigate } from 'react-router-dom';
 import { useStore } from './store';
@@ -41,6 +43,8 @@ function AppContent() {
           <Route path="/create-trip" element={<ProtectedRoute><CreateTrip /></ProtectedRoute>} />
           <Route path="/build-itinerary" element={<ProtectedRoute><BuildItinerary /></ProtectedRoute>} />
           <Route path="/itinerary/:id" element={<ProtectedRoute><ItineraryView /></ProtectedRoute>} />
+          <Route path="/shared/:id" element={<SharedItinerary />} />
+          <Route path="/budget" element={<ProtectedRoute><BudgetView /></ProtectedRoute>} />
           <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
