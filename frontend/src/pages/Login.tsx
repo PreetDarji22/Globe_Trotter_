@@ -6,7 +6,7 @@ import { SafeImage } from '../components/SafeImage';
 
 export default function Login({ isRegister = false }: { isRegister?: boolean }) {
   const navigate = useNavigate();
-  const { login } = useStore() as any;
+  const { login, register } = useStore() as any;
   
   const [mode, setMode] = useState<'login' | 'register'>(isRegister ? 'register' : 'login');
   const [email, setEmail] = useState('');
