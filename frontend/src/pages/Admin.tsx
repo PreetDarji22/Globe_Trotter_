@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ActionBar } from '../components/ActionBar';
 import { PieChart, Pie, LineChart, Line, BarChart, Bar, ResponsiveContainer, Cell, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { useStore } from '../store';
 
 export default function Admin() {
   const [tab, setTab] = useState('User Trends and Analytics');
   const tabs = ['Manage Users', 'Popular cities', 'Popular Activities', 'User Trends and Analytics'];
+  const { fetchAdminStats } = useStore() as any;
+  const [stats, setStats] = useState<any>(null);
+
+  useEffect(() => {
+    fetchAdminStats().then((data: any) => {
+      if (data) setStats(data);
+    });
+  }, []);
+
+  if (!stats) return <div className="p-10 text-center font-bold">Loading stats...</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-4 animate-in fade-in duration-500">
@@ -26,13 +37,19 @@ export default function Admin() {
         
         {/* Top Left: List View */}
         <div className="flex flex-col gap-6 justify-center">
-           <h4 className="font-bold text-slate mb-2">Top Referrers</h4>
-           {['Google Organic', 'Instagram Campaign', 'TikTok Influencers', 'Direct Traffic'].map((name, i) => (
-             <div key={i} className="flex items-center gap-4">
-               <div className="w-10 h-10 rounded-full border border-stone-200 bg-stone-50 flex items-center justify-center font-bold text-stone-500">{i+1}</div>
-               <div className="font-bold text-slate">{name}</div>
-             </div>
-           ))}
+           <h4 className="font-bold text-slate mb-2">Platform Totals</h4>
+           <div className="flex items-center gap-4">
+             <div className="w-12 h-12 rounded-full border border-stone-200 bg-stone-50 flex items-center justify-center font-bold text-stone-500 text-xl">{stats.totalUsers}</div>
+             <div className="font-bold text-slate text-xl">Total Users</div>
+           </div>
+           <div className="flex items-center gap-4">
+             <div className="w-12 h-12 rounded-full border border-stone-200 bg-stone-50 flex items-center justify-center font-bold text-stone-500 text-xl">{stats.totalTrips}</div>
+             <div className="font-bold text-slate text-xl">Total Trips</div>
+           </div>
+           <div className="flex items-center gap-4">
+             <div className="w-12 h-12 rounded-full border border-stone-200 bg-stone-50 flex items-center justify-center font-bold text-stone-500 text-xl">{stats.totalStops}</div>
+             <div className="font-bold text-slate text-xl">Total City Stops</div>
+           </div>
         </div>
         
         {/* Top Right: Pie Chart */}
@@ -53,7 +70,7 @@ export default function Admin() {
         <div className="h-80 col-span-1 md:col-span-2 mt-4 bg-stone-50 p-6 rounded-3xl border border-stone-200">
           <h4 className="font-bold text-slate mb-6">User Signups & Engagement</h4>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={[{name:'Jan', v: 400},{name:'Feb', v: 600},{name:'Mar', v: 800},{name:'Apr', v: 1200},{name:'May', v: 1800}]}>
+            <LineChart data={stats.trendData}>
                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7e5e4" />
                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#78716c', fontWeight: 600}} dy={10} />
                <YAxis axisLine={false} tickLine={false} tick={{fill: '#78716c', fontWeight: 600}} dx={-10} />
@@ -67,7 +84,7 @@ export default function Admin() {
         <div className="h-64 mt-4">
           <h4 className="font-bold text-slate mb-6">Revenue by Category</h4>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={[{name: 'Flights', v: 40},{name: 'Hotels', v: 70},{name: 'Activities', v: 50}]}>
+            <BarChart data={stats.revenueData}>
                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#78716c', fontWeight: 600}} dy={10} />
                <Bar dataKey="v" fill="#1E232A" radius={[8,8,0,0]} />
             </BarChart>
