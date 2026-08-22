@@ -4,6 +4,11 @@
 
 ![GlobeTrotter Banner](https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80)
 
+### 🔗 Live Links
+- 🚀 **Live Production Website:** [https://globe-trotter-sooty.vercel.app](https://globe-trotter-sooty.vercel.app)
+- ⚡ **Live Backend API:** [https://globe-trotter-1jjk.onrender.com](https://globe-trotter-1jjk.onrender.com)
+- 🐙 **GitHub Repository:** [https://github.com/PreetDarji22/Globe_Trotter_](https://github.com/PreetDarji22/Globe_Trotter_)
+
 ---
 
 ## 🌟 Overall Vision
@@ -120,6 +125,7 @@ flowchart TD
 
 ### Frontend
 - **Framework:** React 18 with TypeScript & Vite
+- **Deployment Platform:** Vercel Global CDN
 - **Styling:** Vanilla CSS & TailwindCSS (custom design system tokens)
 - **State Management:** Zustand with LocalStorage Persistence
 - **Icons & Visuals:** Lucide React icons & Unsplash curated media
@@ -128,6 +134,7 @@ flowchart TD
 
 ### Backend
 - **Runtime:** Node.js (TypeScript with `tsx`)
+- **Deployment Platform:** Render Cloud Web Services
 - **Server Framework:** Express.js
 - **Database:** Supabase PostgreSQL Database
 - **ORM / Driver:** Prisma 7 with `@prisma/adapter-pg`
@@ -178,6 +185,7 @@ Globe_Trotter_/
 │   │   ├── store.ts             # Zustand store for state management
 │   │   ├── App.tsx              # App routes & protected route wrapper
 │   │   └── index.css            # Tailwind & global design tokens
+│   ├── vercel.json              # Vercel proxy & SPA routing configuration
 │   ├── vite.config.ts
 │   └── package.json
 └── README.md
@@ -196,7 +204,7 @@ Globe_Trotter_/
 
 ### Step 1: Clone the Repository & Navigate
 ```bash
-git clone https://github.com/your-repo/Globe_Trotter.git
+git clone https://github.com/PreetDarji22/Globe_Trotter_.git
 cd Globe_Trotter_
 ```
 
