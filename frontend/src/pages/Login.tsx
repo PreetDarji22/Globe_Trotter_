@@ -4,19 +4,34 @@ import { useStore } from '../store';
 
 export default function Login({ isRegister = false }: { isRegister?: boolean }) {
   const navigate = useNavigate();
-  const { login } = useStore() as any;
+  const { login, register } = useStore() as any;
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
+  const [country, setCountry] = useState('');
   const [error, setError] = useState('');
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const success = await login(email, password);
-    if (success) {
-      navigate('/');
+
+    if (isRegister) {
+      const result = await register({ firstName, lastName, email, password });
+      if (result.success) {
+        navigate('/');
+      } else {
+        setError(result.error || 'Registration failed. Please try again.');
+      }
     } else {
-      setError('Invalid credentials. Please try again.');
+      const success = await login(email, password);
+      if (success) {
+        navigate('/');
+      } else {
+        setError('Invalid credentials. Please try again.');
+      }
     }
   };
 
@@ -27,17 +42,17 @@ export default function Login({ isRegister = false }: { isRegister?: boolean }) 
         <form onSubmit={handleSubmit} className="w-full border-2 border-slate rounded-2xl p-8 bg-white shadow-[4px_4px_0px_rgba(30,35,42,1)]">
           {error && <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl font-bold border border-red-200">{error}</div>}
           <div className="grid grid-cols-2 gap-6 mb-6">
-            <input required placeholder="First Name" className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
-            <input required placeholder="Last Name" className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
+            <input required placeholder="First Name" value={firstName} onChange={e => setFirstName(e.target.value)} className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
+            <input required placeholder="Last Name" value={lastName} onChange={e => setLastName(e.target.value)} className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
             <input required type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
             <input required type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
-            <input required placeholder="Phone Number" className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
-            <input required placeholder="City" className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
-            <input required placeholder="Country" className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
+            <input placeholder="Phone Number" value={phone} onChange={e => setPhone(e.target.value)} className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
+            <input placeholder="City" value={city} onChange={e => setCity(e.target.value)} className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
+            <input placeholder="Country" value={country} onChange={e => setCountry(e.target.value)} className="border-2 border-slate rounded-xl px-4 py-3 outline-none focus:border-terracotta font-medium" />
           </div>
           <textarea placeholder="Additional Information ...." rows={5} className="w-full border-2 border-slate rounded-xl px-4 py-3 mb-8 outline-none focus:border-terracotta font-medium"></textarea>
           <div className="flex justify-center mb-4">
-             <button type="submit" className="border-2 border-slate rounded-full px-12 py-3 font-bold bg-genz-orange text-white hover:opacity-90 transition-opacity text-lg">Register Users</button>
+             <button type="submit" className="border-2 border-slate rounded-full px-12 py-3 font-bold bg-genz-orange text-white hover:opacity-90 transition-opacity text-lg">Register User</button>
           </div>
           <p className="text-center font-medium"><Link to="/login" className="underline hover:text-terracotta">Back to Login</Link></p>
         </form>

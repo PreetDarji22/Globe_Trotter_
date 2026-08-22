@@ -36,7 +36,10 @@ export const Navigation = () => {
             {/* Nav Links */}
             <div className="flex space-x-6 shrink-0">
                <Link to="/trips" className={`text-sm font-semibold transition-colors ${location.pathname.includes('/trips') ? 'text-terracotta' : 'text-stone-600 hover:text-slate'}`}>My Trips</Link>
+               <Link to="/budget" className={`text-sm font-semibold transition-colors ${location.pathname === '/budget' ? 'text-terracotta' : 'text-stone-600 hover:text-slate'}`}>Budget</Link>
+               <Link to="/calendar" className={`text-sm font-semibold transition-colors ${location.pathname === '/calendar' ? 'text-terracotta' : 'text-stone-600 hover:text-slate'}`}>Calendar</Link>
                <Link to="/community" className={`text-sm font-semibold transition-colors ${location.pathname === '/community' ? 'text-terracotta' : 'text-stone-600 hover:text-slate'}`}>Community</Link>
+               <Link to="/admin" className={`text-sm font-semibold transition-colors ${location.pathname === '/admin' ? 'text-terracotta' : 'text-stone-600 hover:text-slate'}`}>Admin</Link>
             </div>
           </div>
 
