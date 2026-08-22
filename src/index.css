@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-cream text-slate font-sans antialiased overflow-x-hidden;
+}
+
+/* Custom scrollbar for a polished feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-sand;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-stone-300 rounded-full hover:bg-stone-400 transition-colors;
+}
