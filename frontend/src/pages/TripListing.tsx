@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ActionBar } from '../components/ActionBar';
 import { useStore } from '../store';
 import { MapPin, ArrowRight } from 'lucide-react';
@@ -6,7 +6,11 @@ import { Link } from 'react-router-dom';
 import { SafeImage } from '../components/SafeImage';
 
 export default function TripListing() {
-  const { trips } = useStore();
+  const { trips, fetchTrips } = useStore() as any;
+
+  useEffect(() => {
+    fetchTrips();
+  }, []);
   
   const renderSection = (title: string, status: string) => {
     const sectionTrips = trips.filter(t => t.status === status);

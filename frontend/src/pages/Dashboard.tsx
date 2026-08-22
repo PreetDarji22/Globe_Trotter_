@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionBar } from '../components/ActionBar';
 import { useStore } from '../store';
@@ -6,7 +6,11 @@ import { MapPin, Plus } from 'lucide-react';
 import { SafeImage } from '../components/SafeImage';
 
 export default function Dashboard() {
-  const { trips } = useStore();
+  const { trips, fetchTrips } = useStore() as any;
+
+  useEffect(() => {
+    fetchTrips();
+  }, []);
   
   const regions = [
     { name: 'Kyoto, Japan', img: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80', desc: 'Ancient Temples & Gardens' },

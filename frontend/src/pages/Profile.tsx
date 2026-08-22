@@ -5,14 +5,9 @@ import { Link } from 'react-router-dom';
 import { SafeImage } from '../components/SafeImage';
 
 export default function Profile() {
-  const { user, trips } = useStore();
+  const { user, trips, logout } = useStore();
 
-  const buddies = [
-    { name: 'Sarah Jenkins', trips: 2, img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150' },
-    { name: 'Marcus Doe', trips: 1, img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150' },
-    { name: 'Elena Rossi', trips: 4, img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150' },
-    { name: 'James Kim', trips: 1, img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150' }
-  ];
+  const buddies: any[] = [];
 
   return (
     <div className="max-w-6xl mx-auto p-4 animate-in fade-in duration-500">
@@ -31,9 +26,17 @@ export default function Profile() {
             <p className="text-stone-500 font-medium flex items-center justify-center md:justify-start gap-1.5 mb-2"><MapPin size={16}/> New York, USA</p>
             <p className="text-slate/60 text-sm font-medium">{user?.email}</p>
           </div>
-          <button className="mt-6 md:mt-0 border-2 border-slate text-slate px-8 py-3 rounded-full font-bold hover:bg-slate hover:text-white transition-colors flex items-center gap-2">
-            <Settings size={18} /> Edit Profile
-          </button>
+          <div className="mt-6 md:mt-0 flex gap-4">
+            <button className="border-2 border-slate text-slate px-8 py-3 rounded-full font-bold hover:bg-slate hover:text-white transition-colors flex items-center gap-2">
+              <Settings size={18} /> Edit Profile
+            </button>
+            <button 
+              onClick={() => logout()} 
+              className="border-2 border-red-500 text-red-500 px-8 py-3 rounded-full font-bold hover:bg-red-500 hover:text-white transition-colors flex items-center gap-2"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
 
