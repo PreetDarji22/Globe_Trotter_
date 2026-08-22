@@ -39,11 +39,16 @@ export default function ItineraryView() {
   }, [id]);
 
   const handleAddActivity = async (stopId: string) => {
+    const costVal = parseFloat(activityForm.cost) || 0;
     await addActivity(stopId, {
-      title: activityForm.title,
-      cost: parseFloat(activityForm.cost) || 0,
+      name: activityForm.title || 'New Activity',
+      title: activityForm.title || 'New Activity',
+      category: activityForm.type,
       activityType: activityForm.type,
-      startTime: new Date(new Date().toDateString() + ' ' + activityForm.startTime).toISOString()
+      estimatedCost: costVal,
+      cost: costVal,
+      durationMinutes: 60,
+      startTime: new Date().toISOString()
     });
     setShowActivityForm(null);
     setActivityForm({ title: '', cost: '', type: 'Sightseeing', startTime: '10:00 AM' });
@@ -64,12 +69,17 @@ export default function ItineraryView() {
   };
 
   const totalCost = currentTrip.stops?.reduce((acc: number, stop: any) => {
-    return acc + stop.activities.reduce((sum: number, act: any) => sum + (act.cost || 0), 0);
+    return acc + (stop.activities?.reduce((sum: number, act: any) => {
+      const c = Number(act.estimatedCost ?? act.cost ?? 0);
+      return sum + c;
+    }, 0) || 0);
   }, 0) || 0;
 
   const categoryCosts = currentTrip.stops?.reduce((acc: any, stop: any) => {
-    stop.activities.forEach((act: any) => {
-      acc[act.activityType] = (acc[act.activityType] || 0) + (act.cost || 0);
+    stop.activities?.forEach((act: any) => {
+      const cat = act.category || act.activityType || 'Sightseeing';
+      const c = Number(act.estimatedCost ?? act.cost ?? 0);
+      acc[cat] = (acc[cat] || 0) + c;
     });
     return acc;
   }, {}) || {};
