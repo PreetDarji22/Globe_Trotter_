@@ -15,6 +15,7 @@ export default function CreateTrip() {
     destination: '',
     startDate: '',
     endDate: '',
+    image: '',
     isPublic: true
   });
 

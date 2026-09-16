@@ -30,24 +30,52 @@ export default function Login({ isRegister = false }: { isRegister?: boolean }) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!email || !password) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const loginEmail = email || (mode === 'login' ? 'mia.chen@globe.com' : '');
-      const loginPass = password || 'password123';
-      const success = await login(loginEmail, loginPass);
-      setLoading(false);
+      if (mode === 'register') {
+        if (!firstName || !lastName) {
+          setError('Please provide your first and last name.');
+          setLoading(false);
+          return;
+        }
 
-      if (success) {
-        navigate('/');
+        const res = await register({
+          firstName,
+          lastName,
+          email,
+          password,
+          profilePicture: avatarUrl
+        });
+
+        setLoading(false);
+        if (res.success) {
+          navigate('/');
+        } else {
+          setError(res.error || 'Registration failed. Please try again.');
+        }
       } else {
-        setError('Invalid credentials. Please check your email and password.');
+        const success = await login(email, password);
+        setLoading(false);
+
+        if (success) {
+          navigate('/');
+        } else {
+          setError('Invalid email or password. Please try again.');
+        }
       }
     } catch (err) {
       setLoading(false);
-      setError('An error occurred during authentication.');
+      setError('An error occurred during authentication. Please try again.');
     }
   };
+
 
   const handleDemoLogin = async () => {
     setLoading(true);

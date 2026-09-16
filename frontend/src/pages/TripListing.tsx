@@ -13,7 +13,7 @@ export default function TripListing() {
   }, []);
   
   const renderSection = (title: string, status: string) => {
-    const sectionTrips = trips.filter(t => t.status === status);
+    const sectionTrips = trips.filter((t: any) => t.status === status);
     if (sectionTrips.length === 0) return null;
 
     return (
@@ -23,7 +23,7 @@ export default function TripListing() {
           <div className="h-px bg-stone-200 flex-1"></div>
         </h3>
         <div className="space-y-6">
-          {sectionTrips.map(trip => (
+          {sectionTrips.map((trip: any) => (
             <Link to={`/itinerary/${trip.id}`} key={trip.id} className="group block w-full bg-white border border-stone-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col md:flex-row">
               <div className="md:w-72 h-48 md:h-auto overflow-hidden relative shrink-0">
                 <SafeImage src={trip.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={trip.name} />

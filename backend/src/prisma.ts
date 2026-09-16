@@ -3,9 +3,13 @@ import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.hwpfwoyqamkmdycnklbg:QAC43w5DxjXSgxe3@aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres';
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL environment variable is required.');
+}
+
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-export default prisma;
+export default prisma;
