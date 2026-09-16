@@ -91,22 +91,12 @@ export const useStore = create<AppState>()(
       },
 
       login: async (email, password = 'securepassword123') => {
-        // For the hackathon, we auto-register if the user doesn't exist, or login if they do
         try {
-          let res = await fetch('/api/auth/login', {
+          const res = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
           });
-          
-          if (!res.ok) {
-            // If login fails, try to register them (Hackathon fast-path)
-            res = await fetch('/api/auth/register', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ firstName: email.split('@')[0], lastName: 'User', email, password })
-            });
-          }
           
           if (res.ok) {
             const data = await res.json();
@@ -114,7 +104,7 @@ export const useStore = create<AppState>()(
               user: { 
                 name: `${data.user.firstName} ${data.user.lastName}`, 
                 email: data.user.email, 
-                avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+                avatar: data.user.profilePicture || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
                 token: data.token 
               } 
             });

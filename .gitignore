@@ -1,6 +1,40 @@
-
+# Dependencies
 node_modules/
+backend/node_modules/
 frontend/node_modules/
 
+# Environment variables
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Production builds
 dist/
+backend/dist/
 frontend/dist/
+
+# Test coverage
+coverage/
+backend/coverage/
+frontend/coverage/
+
+# AI Tool Scaffolding & IDE
+.claude/
+.agents/
+.windsurf/
+.vscode/
+.idea/
+backend/.claude/
+backend/.agents/
+backend/.windsurf/
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db

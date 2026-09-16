@@ -93,7 +93,7 @@ export default function BuildItinerary() {
       
       <div className="flex flex-col md:flex-row items-center justify-center gap-6 pb-12 pt-8">
         <button 
-          onClick={() => setSections([...sections, { id: Date.now().toString(), dateRange: '', budget: '' }])} 
+          onClick={() => setSections([...sections, { id: Date.now().toString(), location: '', dateRange: '', budget: '' }])} 
           className="w-full md:w-auto border-2 border-stone-200 rounded-full px-10 py-4 font-bold text-stone-600 hover:bg-stone-50 hover:text-slate hover:border-stone-300 transition-all flex justify-center items-center gap-3 text-lg"
         >
           <span className="text-2xl font-light leading-none">+</span> Add another Section
